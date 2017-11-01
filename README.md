@@ -1,4 +1,4 @@
-# NemoTravel: React Date Picker
+# NemoTravel: React-Select
 
 For further documentation head to https://github.com/JedWatson/react-select
 
