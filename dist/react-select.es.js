@@ -1128,11 +1128,17 @@ var Select$1 = function (_React$Component) {
 			var valueType = typeof value === 'undefined' ? 'undefined' : _typeof(value);
 			if (valueType !== 'string' && valueType !== 'number' && valueType !== 'boolean') return value;
 			var options = props.options,
-			    valueKey = props.valueKey;
+			    valueKey = props.valueKey,
+			    defaultOptions = props.defaultOptions;
 
-			if (!options) return;
-			for (var i = 0; i < options.length; i++) {
-				if (String(options[i][valueKey]) === String(value)) return options[i];
+			if (options && options.length > 0) {
+				for (var i = 0; i < options.length; i++) {
+					if (String(options[i][valueKey]) === String(value)) return options[i];
+				}
+			} else if (defaultOptions && defaultOptions.length > 0) {
+				for (var i = 0; i < defaultOptions.length; i++) {
+					if (String(defaultOptions[i][valueKey]) === String(value)) return defaultOptions[i];
+				}
 			}
 		}
 	}, {
@@ -1542,6 +1548,14 @@ var Select$1 = function (_React$Component) {
 		value: function filterOptions$$1(excludeOptions) {
 			var filterValue = this.state.inputValue;
 			var options = this.props.options || [];
+
+			if (!options.length && this.props.defaultOptions && this.props.defaultOptions.length) {
+				options = this.props.defaultOptions;
+				this._optionsIsDefault = true;
+			} else {
+				this._optionsIsDefault = false;
+			}
+
 			if (this.props.filterOptions) {
 				// Maintain backwards compatibility with boolean attribute
 				var filterOptions$$1 = typeof this.props.filterOptions === 'function' ? this.props.filterOptions : filterOptions;
@@ -1570,7 +1584,7 @@ var Select$1 = function (_React$Component) {
 	}, {
 		key: 'renderMenu',
 		value: function renderMenu(options, valueArray, focusedOption) {
-			if (options && options.length) {
+			if (options && options.length && !this._optionsIsDefault) {
 				return this.props.menuRenderer({
 					focusedOption: focusedOption,
 					focusOption: this.focusOption,
@@ -1589,6 +1603,38 @@ var Select$1 = function (_React$Component) {
 					valueKey: this.props.valueKey,
 					onOptionRef: this.onOptionRef
 				});
+			} else if (options && options.length && this._optionsIsDefault) {
+				return React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'div',
+						{ className: 'Select-defaultOptions-hint' },
+						this.props.defaultOptionsHint
+					),
+					React.createElement(
+						'div',
+						{ className: 'Select-defaultOptions' },
+						this.props.menuRenderer({
+							focusedOption: focusedOption,
+							focusOption: this.focusOption,
+							inputValue: this.state.inputValue,
+							instancePrefix: this._instancePrefix,
+							labelKey: this.props.labelKey,
+							onFocus: this.focusOption,
+							onSelect: this.selectValue,
+							optionClassName: this.props.optionClassName,
+							optionComponent: this.props.optionComponent,
+							optionRenderer: this.props.optionRenderer || this.getOptionLabel,
+							options: options,
+							selectValue: this.selectValue,
+							removeValue: this.removeValue,
+							valueArray: valueArray,
+							valueKey: this.props.valueKey,
+							onOptionRef: this.onOptionRef
+						})
+					)
+				);
 			} else if (this.props.noResultsText) {
 				return React.createElement(
 					'div',
@@ -1779,6 +1825,8 @@ Select$1.propTypes = {
 	clearValueText: stringOrNode, // title for the "clear" control
 	clearable: PropTypes.bool, // should it be possible to reset value
 	closeOnSelect: PropTypes.bool, // whether to close the menu when a value is selected
+	defaultOptions: PropTypes.array, // default will be show when options is empty
+	defaultOptionsHint: PropTypes.string, // text under default options
 	deleteRemoves: PropTypes.bool, // whether delete removes an item if there is no text input
 	delimiter: PropTypes.string, // delimiter to use to join multiple values for the hidden field value
 	disabled: PropTypes.bool, // whether the Select is disabled or not

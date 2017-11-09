@@ -13,6 +13,7 @@ import CustomRender from './components/CustomRender';
 import Multiselect from './components/Multiselect';
 import NumericSelect from './components/NumericSelect';
 import BooleanSelect from './components/BooleanSelect';
+import DefaultValues from './components/DefaultValues';
 import Virtualized from './components/Virtualized';
 import States from './components/States';
 
@@ -25,6 +26,7 @@ ReactDOM.render(
 		<GithubUsers label="GitHub users (Async with fetch.js)" />
 		<NumericSelect label="Numeric Values" />
 		<BooleanSelect label="Boolean Values" />
+		<DefaultValues label="Default Options" />
 		<CustomRender label="Custom Render Methods"/>
 		<CustomComponents label="Custom Placeholder, Option, Value, and Arrow Components" />
 		<Creatable

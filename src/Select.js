@@ -502,10 +502,16 @@ class Select extends React.Component {
 	expandValue (value, props) {
 		const valueType = typeof value;
 		if (valueType !== 'string' && valueType !== 'number' && valueType !== 'boolean') return value;
-		let { options, valueKey } = props;
-		if (!options) return;
-		for (var i = 0; i < options.length; i++) {
-			if (String(options[i][valueKey]) === String(value)) return options[i];
+		let { options, valueKey, defaultOptions } = props;
+		if (options && options.length > 0) {
+			for (var i = 0; i < options.length; i++) {
+				if (String(options[i][valueKey]) === String(value)) return options[i];
+			}
+		}
+		else if (defaultOptions && defaultOptions.length > 0) {
+			for (var i = 0; i < defaultOptions.length; i++) {
+				if (String(defaultOptions[i][valueKey]) === String(value)) return defaultOptions[i];
+			}
 		}
 	}
 
@@ -874,6 +880,15 @@ class Select extends React.Component {
 	filterOptions (excludeOptions) {
 		var filterValue = this.state.inputValue;
 		var options = this.props.options || [];
+
+		if (!options.length && this.props.defaultOptions && this.props.defaultOptions.length) {
+			options = this.props.defaultOptions;
+			this._optionsIsDefault = true;
+		}
+		else {
+			this._optionsIsDefault = false;
+		}
+
 		if (this.props.filterOptions) {
 			// Maintain backwards compatibility with boolean attribute
 			const filterOptions = typeof this.props.filterOptions === 'function'
@@ -907,7 +922,7 @@ class Select extends React.Component {
 	}
 
 	renderMenu (options, valueArray, focusedOption) {
-		if (options && options.length) {
+		if (options && options.length && !this._optionsIsDefault) {
 			return this.props.menuRenderer({
 				focusedOption,
 				focusOption: this.focusOption,
@@ -926,6 +941,33 @@ class Select extends React.Component {
 				valueKey: this.props.valueKey,
 				onOptionRef: this.onOptionRef,
 			});
+		}
+		else if (options && options.length && this._optionsIsDefault) {
+			return (<div>
+				<div className="Select-defaultOptions-hint">
+					{this.props.defaultOptionsHint}
+				</div>
+				<div className="Select-defaultOptions">
+					{this.props.menuRenderer({
+						focusedOption,
+						focusOption: this.focusOption,
+						inputValue: this.state.inputValue,
+						instancePrefix: this._instancePrefix,
+						labelKey: this.props.labelKey,
+						onFocus: this.focusOption,
+						onSelect: this.selectValue,
+						optionClassName: this.props.optionClassName,
+						optionComponent: this.props.optionComponent,
+						optionRenderer: this.props.optionRenderer || this.getOptionLabel,
+						options,
+						selectValue: this.selectValue,
+						removeValue: this.removeValue,
+						valueArray,
+						valueKey: this.props.valueKey,
+						onOptionRef: this.onOptionRef,
+					})}
+				</div>
+			</div>);
 		} else if (this.props.noResultsText) {
 			return (
 				<div className="Select-noresults">
@@ -1007,6 +1049,11 @@ class Select extends React.Component {
 	render () {
 		let valueArray = this.getValueArray(this.props.value);
 		let options = this._visibleOptions = this.filterOptions(this.props.multi && this.props.removeSelected ? valueArray : null);
+		let defaultOptions = this.props.defaultOptions;
+		//console.log(options);
+		//if (!options || (options && !options.length)) {
+		//	this._visibleOptions = defaultOptions;
+		//}
 		let isOpen = this.state.isOpen;
 		if (this.props.multi && !options.length && valueArray.length && !this.state.inputValue) isOpen = false;
 		const focusedOptionIndex = this.getFocusableOptionIndex(valueArray[0]);
@@ -1091,6 +1138,8 @@ Select.propTypes = {
 	clearValueText: stringOrNode,         // title for the "clear" control
 	clearable: PropTypes.bool,            // should it be possible to reset value
 	closeOnSelect: PropTypes.bool,        // whether to close the menu when a value is selected
+	defaultOptions: PropTypes.array,      // default will be show when options is empty
+	defaultOptionsHint: PropTypes.string, // text under default options
 	deleteRemoves: PropTypes.bool,        // whether delete removes an item if there is no text input
 	delimiter: PropTypes.string,          // delimiter to use to join multiple values for the hidden field value
 	disabled: PropTypes.bool,             // whether the Select is disabled or not
