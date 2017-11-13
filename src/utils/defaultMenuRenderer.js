@@ -28,10 +28,6 @@ function menuRenderer ({
 		});
 
 		return (
-			<div className={option.customClassName} key={`option-${i}-${option[valueKey]}`}>
-				{option.firstInGroup ?
-					<div className="Select-groupName">{option.groupName}</div> : ''
-				}
 				<Option
 					className={optionClass}
 					instancePrefix={instancePrefix}
@@ -47,7 +43,6 @@ function menuRenderer ({
 				>
 					{optionRenderer(option, i)}
 				</Option>
-			</div>
 		);
 	});
 }

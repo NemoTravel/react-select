@@ -504,8 +504,8 @@ class Select extends React.Component {
 		if (valueType !== 'string' && valueType !== 'number' && valueType !== 'boolean') return value;
 		let { options, valueKey, defaultOptions, optionsGroup } = props;
 
-		if (!options.length && optionsGroup.length) {
-			options = this.groupsOptionsConvert();
+		if (optionsGroup.length) {
+			options = options.concat(this.groupsOptionsConvert());
 		}
 
 		if (options && options.length > 0) {
@@ -518,6 +518,7 @@ class Select extends React.Component {
 				if (String(defaultOptions[i][valueKey]) === String(value)) return defaultOptions[i];
 			}
 		}
+
 	}
 
 	setValue (value) {
@@ -1035,6 +1036,9 @@ class Select extends React.Component {
 
 	getFocusableOptionIndex (selectedOption) {
 		var options = this._visibleOptions;
+
+		options = options.concat(this.groupsOptionsConvert());
+
 		if (!options.length) return null;
 
 		const valueKey = this.props.valueKey;
@@ -1059,8 +1063,26 @@ class Select extends React.Component {
 		return null;
 	}
 
+	renderAdditionalsOptions (focusedOption) {
+		if (this.props.optionsGroup && this.props.optionsGroup.length) {
+			return this.props.optionsGroup.map((item, index) => {
+				return <div className={item.className} key={index}>
+					<div className="Select-groupName">
+						{item.label}
+					</div>
+					{this.renderMenu(item.options, null, focusedOption)}
+				</div>;
+			});
+		}
+		else {
+			return null;
+		}
+	}
+
 	renderOuter (options, valueArray, focusedOption) {
 		let menu = this.renderMenu(options, valueArray, focusedOption);
+		let additionalsOptionsGroup = this.renderAdditionalsOptions(focusedOption);
+
 		if (!menu) {
 			return null;
 		}
@@ -1072,6 +1094,7 @@ class Select extends React.Component {
 						 onScroll={this.handleMenuScroll}
 						 onMouseDown={this.handleMouseDownOnMenu}>
 					{menu}
+					{additionalsOptionsGroup}
 				</div>
 			</div>
 		);
@@ -1081,17 +1104,16 @@ class Select extends React.Component {
 		let valueArray = this.getValueArray(this.props.value);
 		let options = this._visibleOptions = this.filterOptions(this.props.multi && this.props.removeSelected ? valueArray : null);
 		let defaultOptions = this.props.defaultOptions;
-		//console.log(options);
-		//if (!options || (options && !options.length)) {
-		//	this._visibleOptions = defaultOptions;
-		//}
+		let optionsWithAdditionals = options.concat(this.groupsOptionsConvert());
 		let isOpen = this.state.isOpen;
+
 		if (this.props.multi && !options.length && valueArray.length && !this.state.inputValue) isOpen = false;
 		const focusedOptionIndex = this.getFocusableOptionIndex(valueArray[0]);
 
 		let focusedOption = null;
+
 		if (focusedOptionIndex !== null) {
-			focusedOption = this._focusedOption = options[focusedOptionIndex];
+			focusedOption = this._focusedOption = optionsWithAdditionals[focusedOptionIndex];
 		} else {
 			focusedOption = this._focusedOption = null;
 		}

@@ -98,32 +98,23 @@ function menuRenderer(_ref) {
 		});
 
 		return React.createElement(
-			'div',
-			{ className: option.customClassName, key: 'option-' + i + '-' + option[valueKey] },
-			option.firstInGroup ? React.createElement(
-				'div',
-				{ className: 'Select-groupName' },
-				option.groupName
-			) : '',
-			React.createElement(
-				Option,
-				{
-					className: optionClass,
-					instancePrefix: instancePrefix,
-					isDisabled: option.disabled,
-					isFocused: isFocused,
-					isSelected: isSelected,
-					key: 'option-' + i + '-' + option[valueKey],
-					onFocus: onFocus,
-					onSelect: onSelect,
-					option: option,
-					optionIndex: i,
-					ref: function ref(_ref2) {
-						onOptionRef(_ref2, isFocused);
-					}
-				},
-				optionRenderer(option, i)
-			)
+			Option,
+			{
+				className: optionClass,
+				instancePrefix: instancePrefix,
+				isDisabled: option.disabled,
+				isFocused: isFocused,
+				isSelected: isSelected,
+				key: 'option-' + i + '-' + option[valueKey],
+				onFocus: onFocus,
+				onSelect: onSelect,
+				option: option,
+				optionIndex: i,
+				ref: function ref(_ref2) {
+					onOptionRef(_ref2, isFocused);
+				}
+			},
+			optionRenderer(option, i)
 		);
 	});
 }
@@ -1142,8 +1133,8 @@ var Select$1 = function (_React$Component) {
 			    optionsGroup = props.optionsGroup;
 
 
-			if (!options.length && optionsGroup.length) {
-				options = this.groupsOptionsConvert();
+			if (optionsGroup.length) {
+				options = options.concat(this.groupsOptionsConvert());
 			}
 
 			if (options && options.length > 0) {
@@ -1721,6 +1712,9 @@ var Select$1 = function (_React$Component) {
 		key: 'getFocusableOptionIndex',
 		value: function getFocusableOptionIndex(selectedOption) {
 			var options = this._visibleOptions;
+
+			options = options.concat(this.groupsOptionsConvert());
+
 			if (!options.length) return null;
 
 			var valueKey = this.props.valueKey;
@@ -1745,11 +1739,35 @@ var Select$1 = function (_React$Component) {
 			return null;
 		}
 	}, {
-		key: 'renderOuter',
-		value: function renderOuter(options, valueArray, focusedOption) {
+		key: 'renderAdditionalsOptions',
+		value: function renderAdditionalsOptions(focusedOption) {
 			var _this9 = this;
 
+			if (this.props.optionsGroup && this.props.optionsGroup.length) {
+				return this.props.optionsGroup.map(function (item, index) {
+					return React.createElement(
+						'div',
+						{ className: item.className, key: index },
+						React.createElement(
+							'div',
+							{ className: 'Select-groupName' },
+							item.label
+						),
+						_this9.renderMenu(item.options, null, focusedOption)
+					);
+				});
+			} else {
+				return null;
+			}
+		}
+	}, {
+		key: 'renderOuter',
+		value: function renderOuter(options, valueArray, focusedOption) {
+			var _this10 = this;
+
 			var menu = this.renderMenu(options, valueArray, focusedOption);
+			var additionalsOptionsGroup = this.renderAdditionalsOptions(focusedOption);
+
 			if (!menu) {
 				return null;
 			}
@@ -1757,34 +1775,38 @@ var Select$1 = function (_React$Component) {
 			return React.createElement(
 				'div',
 				{ ref: function ref(_ref5) {
-						return _this9.menuContainer = _ref5;
+						return _this10.menuContainer = _ref5;
 					}, className: 'Select-menu-outer', style: this.props.menuContainerStyle },
 				React.createElement(
 					'div',
 					{ ref: function ref(_ref4) {
-							return _this9.menu = _ref4;
+							return _this10.menu = _ref4;
 						}, role: 'listbox', tabIndex: -1, className: 'Select-menu', id: this._instancePrefix + '-list',
 						style: this.props.menuStyle,
 						onScroll: this.handleMenuScroll,
 						onMouseDown: this.handleMouseDownOnMenu },
-					menu
+					menu,
+					additionalsOptionsGroup
 				)
 			);
 		}
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this10 = this;
+			var _this11 = this;
 
 			var valueArray = this.getValueArray(this.props.value);
 			var options = this._visibleOptions = this.filterOptions(this.props.multi && this.props.removeSelected ? valueArray : null);
+			var optionsWithAdditionals = options.concat(this.groupsOptionsConvert());
 			var isOpen = this.state.isOpen;
+
 			if (this.props.multi && !options.length && valueArray.length && !this.state.inputValue) isOpen = false;
 			var focusedOptionIndex = this.getFocusableOptionIndex(valueArray[0]);
 
 			var focusedOption = null;
+
 			if (focusedOptionIndex !== null) {
-				focusedOption = this._focusedOption = options[focusedOptionIndex];
+				focusedOption = this._focusedOption = optionsWithAdditionals[focusedOptionIndex];
 			} else {
 				focusedOption = this._focusedOption = null;
 			}
@@ -1814,7 +1836,7 @@ var Select$1 = function (_React$Component) {
 			return React.createElement(
 				'div',
 				{ ref: function ref(_ref7) {
-						return _this10.wrapper = _ref7;
+						return _this11.wrapper = _ref7;
 					},
 					className: className,
 					style: this.props.wrapperStyle },
@@ -1822,7 +1844,7 @@ var Select$1 = function (_React$Component) {
 				React.createElement(
 					'div',
 					{ ref: function ref(_ref6) {
-							return _this10.control = _ref6;
+							return _this11.control = _ref6;
 						},
 						className: 'Select-control',
 						style: this.props.style,
@@ -1911,9 +1933,9 @@ Select$1.propTypes = {
 	openOnFocus: PropTypes.bool, // always open options menu on focus
 	optionClassName: PropTypes.string, // additional class(es) to apply to the <Option /> elements
 	optionComponent: PropTypes.func, // option component to render in dropdown
-	optionsGroup: PropTypes.array, // optgroup
 	optionRenderer: PropTypes.func, // optionRenderer: function (option) {}
 	options: PropTypes.array, // array of options
+	optionsGroup: PropTypes.array, // optgroup
 	pageSize: PropTypes.number, // number of entries to page when using page up/down keys
 	placeholder: stringOrNode, // field placeholder, displayed when there's no value
 	removeSelected: PropTypes.bool, // whether the selected option is removed from the dropdown on multi selects
