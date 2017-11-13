@@ -279,18 +279,27 @@ describe('Select', () => {
 
 		it('should display the labels on mouse click', () => {
 			TestUtils.Simulate.mouseDown(ReactDOM.findDOMNode(instance).querySelector('.Select-control'), { button: 0 });
-			var node = ReactDOM.findDOMNode(instance);
-			expect(node, 'queried for', '.Select-option:nth-child(1)', 'to have items satisfying', 'to have text', 'One');
-			expect(node, 'queried for', '.Select-option:nth-child(2)', 'to have items satisfying', 'to have text', 'Two');
-			expect(node, 'queried for', '.Select-option:nth-child(3)', 'to have items satisfying', 'to have text', 'Three');
+			var node = ReactDOM.findDOMNode(instance),
+				options = node.querySelectorAll('.Select-option'),
+				option1 = options[0],
+				option2 = options[1],
+				option3 = options[2];
+
+			expect(option1.textContent, 'to equal', 'One');
+			expect(option2.textContent, 'to equal', 'Two');
+			expect(option3.textContent, 'to equal', 'Three');
 		});
 
 		it('should filter after entering some text', () => {
 			typeSearchText('T');
-			var node = ReactDOM.findDOMNode(instance);
-			expect(node, 'queried for', '.Select-option:nth-child(1)', 'to have items satisfying', 'to have text', 'Two');
-			expect(node, 'queried for', '.Select-option:nth-child(2)', 'to have items satisfying', 'to have text', 'Three');
-			expect(node, 'queried for', '.Select-option', 'to have length', 2);
+			var node = ReactDOM.findDOMNode(instance),
+				options = node.querySelectorAll('.Select-option'),
+				option1 = options[0],
+				option2 = options[1];
+
+			expect(option1.textContent, 'to equal', 'Two');
+			expect(option2.textContent, 'to equal', 'Three');
+			expect(options, 'to have length', 2);
 		});
 
 		it('should pass input value when entering text', () => {
@@ -301,10 +310,14 @@ describe('Select', () => {
 
 		it('should filter case insensitively', () => {
 			typeSearchText('t');
-			var node = ReactDOM.findDOMNode(instance);
-			expect(node, 'queried for', '.Select-option:nth-child(1)', 'to have items satisfying', 'to have text', 'Two');
-			expect(node, 'queried for', '.Select-option:nth-child(2)', 'to have items satisfying', 'to have text', 'Three');
-			expect(node, 'queried for', '.Select-option', 'to have length', 2);
+			var node = ReactDOM.findDOMNode(instance),
+				options = node.querySelectorAll('.Select-option'),
+				option1 = options[0],
+				option2 = options[1];
+
+			expect(option1.textContent, 'to equal', 'Two');
+			expect(option2.textContent, 'to equal', 'Three');
+			expect(options, 'to have length', 2);
 		});
 
 		it('should filter using "contains"', () => {

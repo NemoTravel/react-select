@@ -14,6 +14,7 @@ import Multiselect from './components/Multiselect';
 import NumericSelect from './components/NumericSelect';
 import BooleanSelect from './components/BooleanSelect';
 import DefaultValues from './components/DefaultValues';
+import OptionGroups from './components/OptionGroups';
 import Virtualized from './components/Virtualized';
 import States from './components/States';
 
@@ -27,6 +28,7 @@ ReactDOM.render(
 		<NumericSelect label="Numeric Values" />
 		<BooleanSelect label="Boolean Values" />
 		<DefaultValues label="Default Options" />
+		<OptionGroups label="Option Groups"/>
 		<CustomRender label="Custom Render Methods"/>
 		<CustomComponents label="Custom Placeholder, Option, Value, and Arrow Components" />
 		<Creatable

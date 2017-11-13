@@ -98,23 +98,32 @@ function menuRenderer(_ref) {
 		});
 
 		return React.createElement(
-			Option,
-			{
-				className: optionClass,
-				instancePrefix: instancePrefix,
-				isDisabled: option.disabled,
-				isFocused: isFocused,
-				isSelected: isSelected,
-				key: 'option-' + i + '-' + option[valueKey],
-				onFocus: onFocus,
-				onSelect: onSelect,
-				option: option,
-				optionIndex: i,
-				ref: function ref(_ref2) {
-					onOptionRef(_ref2, isFocused);
-				}
-			},
-			optionRenderer(option, i)
+			'div',
+			{ className: option.customClassName, key: 'option-' + i + '-' + option[valueKey] },
+			option.firstInGroup ? React.createElement(
+				'div',
+				{ className: 'Select-groupName' },
+				option.groupName
+			) : '',
+			React.createElement(
+				Option,
+				{
+					className: optionClass,
+					instancePrefix: instancePrefix,
+					isDisabled: option.disabled,
+					isFocused: isFocused,
+					isSelected: isSelected,
+					key: 'option-' + i + '-' + option[valueKey],
+					onFocus: onFocus,
+					onSelect: onSelect,
+					option: option,
+					optionIndex: i,
+					ref: function ref(_ref2) {
+						onOptionRef(_ref2, isFocused);
+					}
+				},
+				optionRenderer(option, i)
+			)
 		);
 	});
 }
@@ -1129,7 +1138,13 @@ var Select$1 = function (_React$Component) {
 			if (valueType !== 'string' && valueType !== 'number' && valueType !== 'boolean') return value;
 			var options = props.options,
 			    valueKey = props.valueKey,
-			    defaultOptions = props.defaultOptions;
+			    defaultOptions = props.defaultOptions,
+			    optionsGroup = props.optionsGroup;
+
+
+			if (!options.length && optionsGroup.length) {
+				options = this.groupsOptionsConvert();
+			}
 
 			if (options && options.length > 0) {
 				for (var i = 0; i < options.length; i++) {
@@ -1543,11 +1558,40 @@ var Select$1 = function (_React$Component) {
 				arrow
 			);
 		}
+
+		// convert group options to flat options array
+
+	}, {
+		key: 'groupsOptionsConvert',
+		value: function groupsOptionsConvert() {
+			var groupsOptions = this.props.optionsGroup || [],
+			    options = [];
+
+			groupsOptions.map(function (group) {
+				var label = group.label,
+				    className = group.className ? group.className : '';
+
+				group.options.map(function (option, i) {
+					if (i === 0) {
+						option.firstInGroup = true;
+					}
+					option.groupName = label;
+					option.customClassName = className;
+					options.push(option);
+				});
+			});
+
+			return options;
+		}
 	}, {
 		key: 'filterOptions',
 		value: function filterOptions$$1(excludeOptions) {
 			var filterValue = this.state.inputValue;
 			var options = this.props.options || [];
+
+			if (!options.length && this.props.optionsGroup.length) {
+				options = this.groupsOptionsConvert();
+			}
 
 			if (!options.length && this.props.defaultOptions && this.props.defaultOptions.length) {
 				options = this.props.defaultOptions;
@@ -1867,6 +1911,7 @@ Select$1.propTypes = {
 	openOnFocus: PropTypes.bool, // always open options menu on focus
 	optionClassName: PropTypes.string, // additional class(es) to apply to the <Option /> elements
 	optionComponent: PropTypes.func, // option component to render in dropdown
+	optionsGroup: PropTypes.array, // optgroup
 	optionRenderer: PropTypes.func, // optionRenderer: function (option) {}
 	options: PropTypes.array, // array of options
 	pageSize: PropTypes.number, // number of entries to page when using page up/down keys
@@ -1920,6 +1965,8 @@ Select$1.defaultProps = {
 	onSelectResetsInput: true,
 	onCloseResetsInput: true,
 	openOnClick: true,
+	optionsGroup: [],
+	options: [],
 	optionComponent: Option,
 	pageSize: 5,
 	placeholder: 'Select...',

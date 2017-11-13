@@ -502,7 +502,12 @@ class Select extends React.Component {
 	expandValue (value, props) {
 		const valueType = typeof value;
 		if (valueType !== 'string' && valueType !== 'number' && valueType !== 'boolean') return value;
-		let { options, valueKey, defaultOptions } = props;
+		let { options, valueKey, defaultOptions, optionsGroup } = props;
+
+		if (!options.length && optionsGroup.length) {
+			options = this.groupsOptionsConvert();
+		}
+
 		if (options && options.length > 0) {
 			for (var i = 0; i < options.length; i++) {
 				if (String(options[i][valueKey]) === String(value)) return options[i];
@@ -877,9 +882,35 @@ class Select extends React.Component {
 		);
 	}
 
+	// convert group options to flat options array
+	groupsOptionsConvert () {
+		let groupsOptions = this.props.optionsGroup || [],
+			options = [];
+
+		groupsOptions.map((group) => {
+			let label = group.label,
+				className = group.className ? group.className : '';
+
+			group.options.map((option, i) => {
+				if (i === 0) {
+					option.firstInGroup = true;
+				}
+				option.groupName = label;
+				option.customClassName = className;
+				options.push(option);
+			});
+		});
+
+		return options;
+	}
+
 	filterOptions (excludeOptions) {
 		var filterValue = this.state.inputValue;
 		var options = this.props.options || [];
+
+		if (!options.length && this.props.optionsGroup.length) {
+			options = this.groupsOptionsConvert();
+		}
 
 		if (!options.length && this.props.defaultOptions && this.props.defaultOptions.length) {
 			options = this.props.defaultOptions;
@@ -1182,6 +1213,7 @@ Select.propTypes = {
 	optionComponent: PropTypes.func,      // option component to render in dropdown
 	optionRenderer: PropTypes.func,       // optionRenderer: function (option) {}
 	options: PropTypes.array,             // array of options
+	optionsGroup: PropTypes.array,           // optgroup
 	pageSize: PropTypes.number,           // number of entries to page when using page up/down keys
 	placeholder: stringOrNode,            // field placeholder, displayed when there's no value
 	removeSelected: PropTypes.bool,       // whether the selected option is removed from the dropdown on multi selects
@@ -1233,6 +1265,8 @@ Select.defaultProps = {
 	onSelectResetsInput: true,
 	onCloseResetsInput: true,
 	openOnClick: true,
+	optionsGroup: [],
+	options: [],
 	optionComponent: Option,
 	pageSize: 5,
 	placeholder: 'Select...',

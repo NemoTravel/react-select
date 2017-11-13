@@ -28,21 +28,26 @@ function menuRenderer ({
 		});
 
 		return (
-			<Option
-				className={optionClass}
-				instancePrefix={instancePrefix}
-				isDisabled={option.disabled}
-				isFocused={isFocused}
-				isSelected={isSelected}
-				key={`option-${i}-${option[valueKey]}`}
-				onFocus={onFocus}
-				onSelect={onSelect}
-				option={option}
-				optionIndex={i}
-				ref={ref => { onOptionRef(ref, isFocused); }}
-			>
-				{optionRenderer(option, i)}
-			</Option>
+			<div className={option.customClassName} key={`option-${i}-${option[valueKey]}`}>
+				{option.firstInGroup ?
+					<div className="Select-groupName">{option.groupName}</div> : ''
+				}
+				<Option
+					className={optionClass}
+					instancePrefix={instancePrefix}
+					isDisabled={option.disabled}
+					isFocused={isFocused}
+					isSelected={isSelected}
+					key={`option-${i}-${option[valueKey]}`}
+					onFocus={onFocus}
+					onSelect={onSelect}
+					option={option}
+					optionIndex={i}
+					ref={ref => { onOptionRef(ref, isFocused); }}
+				>
+					{optionRenderer(option, i)}
+				</Option>
+			</div>
 		);
 	});
 }
