@@ -909,10 +909,6 @@ class Select extends React.Component {
 		var filterValue = this.state.inputValue;
 		var options = this.props.options || [];
 
-		if (!options.length && this.props.optionsGroup.length) {
-			options = this.groupsOptionsConvert();
-		}
-
 		if (!options.length && this.props.defaultOptions && this.props.defaultOptions.length) {
 			options = this.props.defaultOptions;
 			this._optionsIsDefault = true;
