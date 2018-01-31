@@ -1,6 +1,6 @@
 {
   "name": "@nemo.travel/react-select",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A Select control built with and for ReactJS",
   "main": "lib/index.js",
   "types": "index.d.ts",

@@ -393,6 +393,11 @@ export interface ReactSelectProps<TValue = OptionValues> extends React.Props<Rea
      */
     options?: Options<TValue>;
     /**
+     * array of Select options groups
+     * @default []
+     */
+    optionsGroup?: { label: string;  options: any[]; className: string; }[];
+    /**
      * number of options to jump when using page up/down keys
      * @default 5
      */
