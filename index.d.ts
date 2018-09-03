@@ -437,7 +437,12 @@ export interface ReactSelectProps<TValue = OptionValues> extends React.Props<Rea
      */
     searchable?: boolean;
     /**
-     * whether to select the currently focused value when the  [tab]  key is pressed
+     * whether to select the currently focused value when the [space] key is pressed
+     * @default true;
+     */
+	spaceSelectsValue?: boolean;
+    /**
+     * whether to select the currently focused value when the [tab] key is pressed
      */
     tabSelectsValue?: boolean;
     /**

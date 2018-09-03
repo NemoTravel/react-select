@@ -1009,6 +1009,9 @@ var Select$1 = function (_React$Component) {
 					break;
 				case 32:
 					// space
+					if (!this.props.spaceSelectsValue) {
+						return;
+					}
 					if (!this.props.searchable) {
 						event.preventDefault();
 					}
@@ -1946,6 +1949,7 @@ Select$1.propTypes = {
 	scrollMenuIntoView: PropTypes.bool, // boolean to enable the viewport to shift so that the full menu fully visible when engaged
 	searchable: PropTypes.bool, // whether to enable searching feature or not
 	simpleValue: PropTypes.bool, // pass the value to onChange as a simple value (legacy pre 1.0 mode), defaults to false
+	spaceSelectsValue: PropTypes.bool, // whether to treat space button to be value selection
 	style: PropTypes.object, // optional style to apply to the control
 	tabIndex: PropTypes.string, // optional tab index of the control
 	tabSelectsValue: PropTypes.bool, // whether to treat tabbing out while focused to be value selection
@@ -1999,6 +2003,7 @@ Select$1.defaultProps = {
 	scrollMenuIntoView: true,
 	searchable: true,
 	simpleValue: false,
+	spaceSelectsValue: true,
 	tabSelectsValue: true,
 	trimFilter: true,
 	valueComponent: Value,
